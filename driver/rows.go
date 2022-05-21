@@ -2,30 +2,54 @@ package driver
 
 import (
 	"database/sql/driver"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
 	"sync"
+
+	"github.com/proullon/ramsql/engine/parser"
 )
 
 // Rows implements the sql/driver Rows interface
 type Rows struct {
 	columns []string
-	rows    [][]interface{}
+	rows    [][]string
 	index   int
 	end     int
 
 	sync.Mutex
 }
 
-func newRows(response []byte) *Rows {
+func newRows(response io.Reader) *Rows {
+	rdr := csv.NewReader(response)
 
-	// TODO
 	r := &Rows{}
+	record, err := rdr.Read()
+	if err != nil {
+		return newEmptyRows()
+	}
+	r.columns = record
 
-	r.end = len(r.rows) - 1
+	for {
+		record, err = rdr.Read()
+		if err != nil {
+			break
+		}
+		r.rows = append(r.rows, record)
+	}
+
+	r.index = 0
+	r.end = len(r.rows)
 
 	return r
+}
+
+func newEmptyRows() *Rows {
+	return &Rows{
+		index: 0,
+		end:   0,
+	}
 }
 
 // Columns returns the names of the columns. The number of
@@ -70,16 +94,11 @@ func (r *Rows) Next(dest []driver.Value) (err error) {
 			continue
 		}
 
-		/*
-			// TODO: make rowsChannel send virtualRows,
-			// so we have the type and don't blindy try to parse date here
-			if t, err := parser.ParseDate(string(v)); err == nil {
-				dest[i] = *t
-			} else {
-		*/
-		//dest[i] = []byte(v)
-		/*}*/
-		// TODO
+		if t, err := parser.ParseDate(string(v)); err == nil {
+			dest[i] = *t
+		} else {
+			dest[i] = []byte(v)
+		}
 	}
 
 	r.index++

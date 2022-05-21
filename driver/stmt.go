@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -26,13 +25,21 @@ type Stmt struct {
 
 // DruidQuery JSON format on /druid/v2/sql
 type DruidQuery struct {
-	Query string `json:"query"`
+	Query        string `json:"query"`
+	ResultFormat string `json:"resultFormat"`
+	Header       bool   `json:"header"`
+	TypesHeader  bool   `json:"typesHeader"`
 }
 
 // NewQuery initialise a marshal ready DruidQuery struct
 func NewQuery(q string) ([]byte, error) {
 
-	qs := DruidQuery{Query: q}
+	qs := DruidQuery{
+		Query:        q,
+		ResultFormat: "csv",
+		Header:       true,
+		TypesHeader:  false,
+	}
 	data, err := json.Marshal(qs)
 	if err != nil {
 		return nil, err
@@ -184,12 +191,7 @@ func (s *Stmt) Query(args []driver.Value) (r driver.Rows, err error) {
 	}
 	defer resp.Body.Close()
 
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot query server (%s)", err)
-	}
-
-	r = newRows(b)
+	r = newRows(resp.Body)
 	return r, nil
 }
 

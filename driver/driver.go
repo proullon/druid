@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
+	"strings"
 )
 
 // init register driver into database/sql package
@@ -28,6 +29,8 @@ func (d *Driver) Open(dsn string) (conn driver.Conn, err error) {
 		return nil, fmt.Errorf("invalid dsn")
 	}
 
-	c := NewConn(dsn+"/v2/druid/sql", "proullon/druid/1.0")
+	dsn = strings.TrimSuffix(dsn, "/")
+
+	c := NewConn(dsn+"/druid/v2/sql", "proullon/druid/1.0")
 	return c, nil
 }
