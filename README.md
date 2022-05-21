@@ -6,10 +6,6 @@ Example:
 ```go
 import (
 	"database/sql"
-	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 	"time"
 
 	_ "github.com/proullon/druid/driver"
@@ -18,7 +14,7 @@ import (
 func main() {
   db, err := sql.Open("druid", "https://druid.domain.com")
 	if err != nil {
-		t.Fatalf("cannot open connection : %s\n", err)
+		panic("cannot open connection : %s\n", err)
 	}
 
 	rows, err := db.Query(`SELECT __time, added, channel, user FROM  "wikipedia" LIMIT 10`)
