@@ -191,6 +191,10 @@ func (s *Stmt) Query(args []driver.Value) (r driver.Rows, err error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("cannot query: %s", resp.Status)
+	}
+
 	r = newRows(resp.Body)
 	return r, nil
 }
