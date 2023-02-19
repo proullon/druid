@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -36,9 +37,9 @@ func NewQuery(q string) ([]byte, error) {
 
 	qs := DruidQuery{
 		Query:        q,
-		ResultFormat: "csv",
+		ResultFormat: "array",
 		Header:       true,
-		TypesHeader:  false,
+		TypesHeader:  true,
 	}
 	data, err := json.Marshal(qs)
 	if err != nil {
@@ -195,8 +196,12 @@ func (s *Stmt) Query(args []driver.Value) (r driver.Rows, err error) {
 		return nil, fmt.Errorf("cannot query: %s", resp.Status)
 	}
 
-	r = newRows(resp.Body)
-	return r, nil
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return r, err
+	}
+
+	return parseResponse(body)
 }
 
 // replace $* by arguments in query string
