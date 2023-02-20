@@ -39,7 +39,7 @@ func NewQuery(q string) ([]byte, error) {
 		Query:        q,
 		ResultFormat: "array",
 		Header:       true,
-		TypesHeader:  true,
+		TypesHeader:  false,
 	}
 	data, err := json.Marshal(qs)
 	if err != nil {

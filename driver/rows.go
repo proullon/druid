@@ -88,6 +88,10 @@ func (r *Rows) Next(dest []driver.Value) (err error) {
 		return errors.New("druid: number of refs passed to scan does not match column count")
 	}
 	for i := range dest {
+		if data[i].Type == nil {
+			log.Warning("druid: data is nil", data[i])
+			continue
+		}
 		switch data[i].Type.Name() {
 		case "bool":
 			dest[i] = data[i].Value.Interface().(bool)
