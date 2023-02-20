@@ -105,58 +105,6 @@ func (s *Stmt) Exec(args []driver.Value) (r driver.Result, err error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-/*
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("fatalf error: %s", r)
-			return
-		}
-	}()
-
-	if s.query == "" {
-		return nil, fmt.Errorf("empty statement")
-	}
-
-	var finalQuery string
-
-	// replace $* by arguments in query string
-	finalQuery = replaceArguments(s.query, args)
-	log.Info("Exec <%s>\n", finalQuery)
-
-	// Send query to server
-	data, err := NewQuery(finalQuery)
-	if err != nil {
-		return nil, err
-	}
-	req, err := http.NewRequest("POST", s.endpoint, bytes.NewBuffer(data))
-	if err != nil {
-		return nil, fmt.Errorf("cannot prepare query (%s)", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", s.userAgent)
-
-	resp, err := s.client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("cannot query server (%s)", err)
-	}
-	defer resp.Body.Close()
-
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot query server (%s)", err)
-	}
-
-	// Get answer from server
-	lastInsertedID, rowsAffected, err := s.conn.conn.ReadResult()
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a driver.Result
-	return newResult(lastInsertedID, rowsAffected), nil
-}
-*/
-
 // Query executes a query that may return rows, such as a
 // SELECT.
 func (s *Stmt) Query(args []driver.Value) (r driver.Rows, err error) {

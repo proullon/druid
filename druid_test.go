@@ -11,21 +11,11 @@ import (
 	_ "github.com/proullon/druid/driver"
 )
 
-var expectedCSV string = `__time,added,channel,user
-2015-09-12T00:46:58.771Z,36,#en.wikipedia,GELongstreet
-2015-09-12T00:47:00.496Z,17,#ca.wikipedia,PereBot
-2015-09-12T00:47:05.474Z,1,#en.wikipedia,60.225.66.142
-2015-09-12T00:47:08.77Z,18,#vi.wikipedia,Cheers!-bot
-2015-09-12T00:47:11.862Z,18,#vi.wikipedia,ThitxongkhoiAWB
-2015-09-12T00:47:13.987Z,18,#vi.wikipedia,ThitxongkhoiAWB
-2015-09-12T00:47:17.009Z,1,#ca.wikipedia,Jaumellecha
-2015-09-12T00:47:19.591Z,345,#en.wikipedia,New Media Theorist
-2015-09-12T00:47:21.578Z,121,#en.wikipedia,WP 1.0 bot
-2015-09-12T00:47:25.821Z,18,#vi.wikipedia,ThitxongkhoiAWB`
+var expectedJSON string = `[["__time","added","channel","user"],["LONG","LONG","STRING","STRING"],["2015-09-12T00:46:58.771Z",36,"#en.wikipedia","GELongstreet"],["2015-09-12T00:47:00.496Z",17,"#ca.wikipedia","PereBot"],["2015-09-12T00:47:08.770Z",18,"#vi.wikipedia","Cheers!-bot"],["2015-09-12T00:47:11.862Z",18,"#vi.wikipedia","ThitxongkhoiAWB"],["2015-09-12T00:47:13.987Z",18,"#vi.wikipedia","ThitxongkhoiAWB"],["2015-09-12T00:47:19.591Z",345,"#en.wikipedia","New Media Theorist"],["2015-09-12T00:47:21.578Z",121,"#en.wikipedia","WP 1.0 bot"],["2015-09-12T00:47:25.821Z",18,"#vi.wikipedia","ThitxongkhoiAWB"],["2015-09-12T00:47:33.004Z",18,"#vi.wikipedia","ThitxongkhoiAWB"],["2015-09-12T00:47:35.776Z",36,"#vi.wikipedia","TuHan-Bot"]]`
 
 func TestQuery(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, expectedCSV)
+		fmt.Fprintln(w, expectedJSON)
 	}))
 	defer ts.Close()
 

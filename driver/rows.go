@@ -5,9 +5,11 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"github.com/proullon/ramsql/engine/log"
 	"reflect"
 	"sync"
+
+	"github.com/proullon/ramsql/engine/log"
+	"github.com/proullon/ramsql/engine/parser"
 )
 
 type field struct {
@@ -44,7 +46,7 @@ func parseResponse(body []byte) (r *Rows, err error) {
 		columnNames = append(columnNames, val.(string))
 	}
 	var returnedRows [][]field
-	for i := 1; i < len(results); i++ {
+	for i := 2; i < len(results); i++ {
 		var cols []field
 		for _, val := range results[i] {
 			cols = append(cols, field{Value: reflect.ValueOf(val), Type: reflect.TypeOf(val)})
@@ -92,6 +94,10 @@ func (r *Rows) Next(dest []driver.Value) (err error) {
 		case "bool":
 			dest[i] = data[i].Value.Interface().(bool)
 		case "string":
+			if t, err := parser.ParseDate(data[i].Value.Interface().(string)); err == nil {
+				dest[i] = *t
+				continue
+			}
 			dest[i] = data[i].Value.Interface().(string)
 		case "int":
 			dest[i] = data[i].Value.Interface().(int)
