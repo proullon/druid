@@ -49,3 +49,25 @@ func TestQuery(t *testing.T) {
 		}
 	}
 }
+
+var expectedJSONWithNullData string = `[["__time","added","channel","user"],["LONG","LONG","STRING","STRING"],["2015-09-12T00:46:58.771Z",36,"#en.wikipedia",null]]`
+
+func TestQueryWithNullData(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, expectedJSON)
+	}))
+	defer ts.Close()
+
+	db, err := sql.Open("druid", ts.URL)
+	if err != nil {
+		t.Fatalf("cannot open connection : %s\n", err)
+	}
+
+	rows, err := db.Query(`SELECT __time, added, channel, user FROM  "wikipedia" LIMIT 10`)
+	if err != nil {
+		t.Fatalf("query: %s", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+	}
+}
